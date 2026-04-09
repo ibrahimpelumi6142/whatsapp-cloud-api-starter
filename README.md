@@ -2,8 +2,6 @@
 
 A production-ready starter template for building WhatsApp automation, bots, and integrations using the **Meta WhatsApp Cloud API** and **Python FastAPI**.
 
-[![CI](https://github.com/ibrahimpelumi6142/whatsapp-cloud-api-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/ibrahimpelumi6142/whatsapp-cloud-api-starter/actions/workflows/ci.yml)
-
 Perfect for:
 - Developers building WhatsApp bots
 - Automation workflows
