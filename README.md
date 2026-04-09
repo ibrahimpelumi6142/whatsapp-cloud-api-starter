@@ -1,6 +1,8 @@
-# 📱 WhatsApp Cloud API Starter Kit (FastAPI)
+# 📱 WhatsApp Cloud API Starter Kit (FastAPI) v2.0
 
-A simple and clean starter template for building WhatsApp automation, bots, and integrations using the **Meta WhatsApp Cloud API** and **Python FastAPI**.
+A production-ready starter template for building WhatsApp automation, bots, and integrations using the **Meta WhatsApp Cloud API** and **Python FastAPI**.
+
+[![CI](https://github.com/ibrahimpelumi6142/whatsapp-cloud-api-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/ibrahimpelumi6142/whatsapp-cloud-api-starter/actions/workflows/ci.yml)
 
 Perfect for:
 - Developers building WhatsApp bots
@@ -13,14 +15,18 @@ Perfect for:
 
 ## 🚀 Features
 
-- Receive messages via webhook  
-- Send text messages  
-- Send images, documents, templates  
-- Verify webhook token  
-- Clean folder structure  
-- `.env` environment setup  
-- Works on localhost or production  
-- Easy to deploy  
+- Receive messages via secure webhook (HMAC SHA-256 signature verification)
+- Send text messages
+- Send images, documents, templates
+- Async HTTP with httpx (non-blocking)
+- Pydantic request/response validation
+- Configurable Graph API version
+- Health check endpoints
+- `.env` environment setup
+- Docker and docker-compose support
+- CI/CD with GitHub Actions
+- Tests with pytest
+- Proper logging and error handling
 
 ---
 
@@ -29,121 +35,168 @@ Perfect for:
 ```txt
 whatsapp-cloud-api-starter/
  ├─ src/
- │   ├─ server.py              # FastAPI server
- │   ├─ send_message.py        # Send message function
- │   ├─ webhook.py             # Webhook handler
- │   └─ utils/
- │        └─ verify_signature.py
+ │  ├─ __init__.py
+ │  ├─ server.py            # FastAPI server with lifespan
+ │  ├─ config.py            # Centralized settings
+ │  ├─ models.py            # Pydantic request/response models
+ │  ├─ send_message.py      # Messaging endpoints
+ │  ├─ webhook.py           # Webhook handler
+ │  └─ utils/
+ │     ├─ __init__.py
+ │     └─ verify_signature.py
+ ├─ tests/
+ │  └─ test_endpoints.py
  ├─ examples/
- │   └─ sample_payload.json
+ │  └─ sample_payload.json
+ ├─ .github/workflows/ci.yml
  ├─ .env.example
+ ├─ .gitignore
+ ├─ Dockerfile
+ ├─ docker-compose.yml
  ├─ requirements.txt
  ├─ README.md
  └─ LICENSE
-
 ```
 
 ---
 
 ## 🔧 Installation
 
-```txt
+```bash
 pip install -r requirements.txt
-
 ```
+
 ---
 
 ## ⚙️ Environment Variables
 
 ### Create .env file:
 
-```txt
-WHATSAPP_TOKEN=
-WHATSAPP_PHONE_NUMBER_ID=
-WHATSAPP_SECRET=
-VERIFY_TOKEN=your_webhook_verify_token
+```bash
+cp .env.example .env
+```
 
 ```
+WHATSAPP_TOKEN=your_api_token
+WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+WHATSAPP_SECRET=your_app_secret
+VERIFY_TOKEN=your_webhook_verify_token
+GRAPH_API_VERSION=v21.0
+```
+
 ---
 
 ## 🚀 Running Locally
 
-```txt
+```bash
 uvicorn src.server:app --reload
-
 ```
+
+Your server runs at: `http://localhost:8000`
+
+Interactive API docs at: `http://localhost:8000/docs`
+
 ---
 
-## Your server runs at:
+## 🐳 Docker
 
-```txt
-http://localhost:8000
-
+```bash
+docker compose up --build
 ```
+
 ---
 
 ## 🔗 Webhook Verification
 
-### Meta will call:
+Meta will call:
 
-```txt
+```
 GET /webhook?hub.verify_token=xxx&hub.challenge=yyy
-
 ```
 
-### We return the challenge if tokens match.
+We return the challenge if tokens match.
 
-## 📩 Sending a WhatsApp Message
+---
 
-```txt
-POST http://localhost:8000/send-message
+## 📩 Sending Messages
+
+All messaging endpoints are under the `/api` prefix.
+
+### Send a text message
 
 ```
+POST /api/send-message
+```
 
-### JSON:
-
-```txt
+```json
 {
   "to": "2348012345678",
   "message": "Hello from WhatsApp Cloud API Starter Kit!"
 }
+```
 
+### Send an image
+
+```
+POST /api/send-image
+```
+
+```json
+{
+  "to": "2348012345678",
+  "image_url": "https://example.com/photo.jpg",
+  "caption": "Check this out"
+}
+```
+
+### Send a document
+
+```
+POST /api/send-document
+```
+
+```json
+{
+  "to": "2348012345678",
+  "document_url": "https://example.com/file.pdf",
+  "filename": "report.pdf"
+}
+```
+
+### Send a template message
+
+```
+POST /api/send-template
+```
+
+```json
+{
+  "to": "2348012345678",
+  "template_name": "hello_world",
+  "language_code": "en_US"
+}
 ```
 
 ---
 
 ## 📥 Receiving Messages
 
-### WhatsApp will POST incoming messages to:
+WhatsApp will POST incoming messages to:
 
-```txt
+```
 POST /webhook
-
 ```
 
-### You will receive a structure like:
+Incoming payloads are validated with HMAC SHA-256 signature verification.
 
-```txt
-{
-  "entry": [
-    {
-      "changes": [
-        {
-          "value": {
-            "messages": [
-              {
-                "from": "2348012345678",
-                "text": { "body": "Hello" }
-              }
-            ]
-          }
-        }
-      ]
-    }
-  ]
-}
+---
 
+## 🧪 Testing
+
+```bash
+pytest tests/ -v
 ```
+
 ---
 
 ## 📝 License
